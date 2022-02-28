@@ -1,0 +1,2 @@
+official docker compose from
+https://dataflow.spring.io/docs/installation/local/docker/
