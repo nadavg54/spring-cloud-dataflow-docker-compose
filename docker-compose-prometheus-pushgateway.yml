@@ -1,0 +1,32 @@
+version: '3'
+
+# Extends the default docker-compose.yml with Prometheus/Grafana monitoring configuration
+# Usage: docker-compose -f ./docker-compose.yml -f ./docker-compose-prometheus.yml up
+services:
+
+  dataflow-server:
+    environment:
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_ENABLED=true
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-rsocket-proxy
+      - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT=7001
+      #- SPRING_APPLICATION_JSON={"spring.jpa.properties.hibernate.generate_statistics":true}
+      - SPRING_CLOUD_DATAFLOW_METRICS_DASHBOARD_URL=http://localhost:3000
+
+  grafana:
+    image: springcloud/spring-cloud-dataflow-grafana-prometheus:${DATAFLOW_VERSION:-2.9.1}
+    container_name: grafana
+    ports:
+      - '3000:3000'
+
+  pushgateway:
+    image: prom/pushgateway:v0.6.0
+    container_name: 'pushgateway'
+    ports:
+      - '9091:9091'
+  
+  prometheus:
+    image: nadavag/scdf-prom-local-nadav:latest
+    container_name: prometheus
+    ports:
+      - '9090:9090'
